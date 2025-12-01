@@ -16,6 +16,9 @@ function ProblemDetail() {
   const [language, setLanguage] = useState('python');
   const [submitting, setSubmitting] = useState(false);
   const [submissionResult, setSubmissionResult] = useState(null);
+  const [nextProblemLoading, setNextProblemLoading] = useState(false);
+  const [nextProblemError, setNextProblemError] = useState('');
+  const [initialCodeLoaded, setInitialCodeLoaded] = useState(false);
 
   const languages = [
     { value: 'python', label: 'Python' },
@@ -25,94 +28,20 @@ function ProblemDetail() {
     { value: 'c', label: 'C' }
   ];
 
-  const defaultCode = {
-    python: `# Read input
-n = int(input())
-nums = list(map(int, input().split()))
-target = int(input())
 
-# Solution
-for i in range(n):
-    for j in range(i+1, n):
-        if nums[i] + nums[j] == target:
-            print(i, j)
-            exit()`,
-    java: `import java.util.*;
-
-public class Main {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int n = sc.nextInt();
-        int[] nums = new int[n];
-        for (int i = 0; i < n; i++) {
-            nums[i] = sc.nextInt();
-        }
-        int target = sc.nextInt();
-        
-        // Solution
-        for (int i = 0; i < n; i++) {
-            for (int j = i + 1; j < n; j++) {
-                if (nums[i] + nums[j] == target) {
-                    System.out.println(i + " " + j);
-                    return;
-                }
-            }
-        }
-    }
-}`,
-    cpp: `#include <iostream>
-using namespace std;
-
-int solution() {
-    // Write your code here
-    return 0;
-}
-
-int main() {
-    int n;
-    cin >> n;
-    cout << solution() << endl;
-    return 0;
-}`,
-    javascript: `function solution() {
-    // Write your code here
-    return 0;
-}
-
-// Read input
-const readline = require('readline');
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-rl.on('line', (line) => {
-    const n = parseInt(line);
-    console.log(solution());
-    rl.close();
-});`,
-    c: `#include <stdio.h>
-
-int solution() {
-    // Write your code here
-    return 0;
-}
-
-int main() {
-    int n;
-    scanf("%d", &n);
-    printf("%d\\n", solution());
-    return 0;
-}`
-  };
 
   useEffect(() => {
     fetchProblem();
   }, [id]);
 
   useEffect(() => {
-    setCode(defaultCode[language] || '');
-  }, [language]);
+    if (!user) {
+      setInitialCodeLoaded(true);
+      setCode('');
+      return;
+    }
+    loadLastSubmission();
+  }, [id, user]);
 
   const fetchProblem = async () => {
     try {
@@ -127,13 +56,50 @@ int main() {
     }
   };
 
+  const loadLastSubmission = async () => {
+    if (!user) {
+      setInitialCodeLoaded(true);
+      return;
+    }
+
+    try {
+      setInitialCodeLoaded(false);
+      const response = await api.get(`/submissions/user/${user.id}/problem/${id}`);
+      if (response.data && response.data.length > 0) {
+        const sorted = [...response.data].sort((a, b) => {
+          const dateA = a.submittedAt ? new Date(a.submittedAt) : 0;
+          const dateB = b.submittedAt ? new Date(b.submittedAt) : 0;
+          return dateB - dateA;
+        });
+        const latest = sorted[0];
+        setCode(latest.code || '');
+        if (latest.language) {
+          setLanguage(latest.language.toLowerCase());
+        }
+      } else {
+        setCode('');
+      }
+    } catch (err) {
+      console.error('Failed to load previous submissions:', err);
+      setCode('');
+    } finally {
+      setInitialCodeLoaded(true);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!code.trim()) {
       alert('Please write some code before submitting');
       return;
     }
 
+    if (!user) {
+      alert('Please log in to submit a solution');
+      return;
+    }
+
     try {
+      setNextProblemError('');
       setSubmitting(true);
       setSubmissionResult({
         status: 'PENDING',
@@ -185,6 +151,31 @@ int main() {
         status: 'ERROR',
         message: 'Failed to get submission result'
       });
+    }
+  };
+
+  const handleNextProblem = async () => {
+    if (!submissionResult) return;
+    setNextProblemError('');
+    setNextProblemLoading(true);
+    try {
+      const response = await api.get('/submissions/next-problem', {
+        params: {
+          userId: user.id,
+          currentProblemId: id,
+          score: submissionResult.accuracy || submissionResult.efficiencyScore || 0
+        }
+      });
+      if (response.data?.id) {
+        navigate(`/problems/${response.data.id}`);
+      } else {
+        setNextProblemError('No recommendation available right now.');
+      }
+    } catch (err) {
+      setNextProblemError('Unable to fetch the next recommendation. Please try again.');
+      console.error('Next problem error:', err);
+    } finally {
+      setNextProblemLoading(false);
     }
   };
 
@@ -356,12 +347,18 @@ int main() {
               </select>
             </div>
             
-            <CodeEditor
-              value={code}
-              onChange={setCode}
-              language={language}
-              height="500px"
-            />
+            {!initialCodeLoaded ? (
+              <div className="min-h-[200px] flex items-center justify-center text-gray-500">
+                Loading your workspace...
+              </div>
+            ) : (
+              <CodeEditor
+                value={code}
+                onChange={setCode}
+                language={language}
+                height="500px"
+              />
+            )}
           </div>
 
           {/* Submission Controls */}
@@ -404,6 +401,22 @@ int main() {
                   <div className="mt-3 p-3 bg-gray-50 rounded-lg">
                     <div className="text-sm font-medium text-gray-700 mb-1">AI Analysis:</div>
                     <div className="text-sm text-gray-600">{submissionResult.analysisFeedback}</div>
+                  </div>
+                )}
+                {submissionResult.status === 'ACCEPTED' && (
+                  <div className="mt-4 space-y-2">
+                    {nextProblemError && (
+                      <div className="text-sm text-red-700 bg-red-100 rounded-md px-3 py-2">
+                        {nextProblemError}
+                      </div>
+                    )}
+                    <button
+                      onClick={handleNextProblem}
+                      className="btn-secondary w-full md:w-auto"
+                      disabled={nextProblemLoading}
+                    >
+                      {nextProblemLoading ? 'Preparing next challenge...' : 'Next Recommended Problem'}
+                    </button>
                   </div>
                 )}
               </div>

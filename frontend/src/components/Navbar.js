@@ -8,7 +8,7 @@ function Navbar() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    // logout() already handles navigation, but we can add this as backup
   };
 
   return (

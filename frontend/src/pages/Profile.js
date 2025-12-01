@@ -3,19 +3,40 @@ import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 
 function Profile() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [stats, setStats] = useState(null);
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchProfileData();
-  }, []);
+    // Wait for auth to finish loading before making API calls
+    if (!authLoading && user && user.id) {
+      fetchProfileData();
+    } else if (!authLoading && !user) {
+      // Auth finished but no user - this shouldn't happen due to ProtectedRoute
+      setError('User not found. Please log in again.');
+      setLoading(false);
+    }
+  }, [user, authLoading]);
 
   const fetchProfileData = async () => {
+    if (!user || !user.id) {
+      setError('User not found. Please log in again.');
+      setLoading(false);
+      return;
+    }
+    
     try {
       setLoading(true);
+      setError('');
+      
+      // Ensure token is set before making the request
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      
       const [statsResponse, submissionsResponse] = await Promise.all([
         api.get(`/submissions/stats/user/${user.id}`),
         api.get(`/submissions/user/${user.id}`)
@@ -24,7 +45,17 @@ function Profile() {
       setStats(statsResponse.data);
       setSubmissions(submissionsResponse.data.slice(0, 10)); // Get last 10 submissions
     } catch (err) {
-      setError('Failed to load profile data');
+      // Don't show error if it's a redirect (interceptor handles it)
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        // Let the interceptor handle the redirect
+        console.warn('Authentication error - redirecting to login');
+      } else if (err.response?.status >= 500) {
+        setError('Server error. Please try again later.');
+      } else if (!err.response) {
+        setError('Unable to connect to server. Please check your connection.');
+      } else {
+        setError('Failed to load profile data. Please try again.');
+      }
       console.error('Profile error:', err);
     } finally {
       setLoading(false);
@@ -47,7 +78,8 @@ function Profile() {
     }
   };
 
-  if (loading) {
+  // Show loading while auth is initializing or data is loading
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>

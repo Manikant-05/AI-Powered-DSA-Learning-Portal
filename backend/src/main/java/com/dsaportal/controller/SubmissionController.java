@@ -1,5 +1,6 @@
 package com.dsaportal.controller;
 
+import com.dsaportal.dto.ProblemDto;
 import com.dsaportal.dto.SubmissionDto;
 import com.dsaportal.entity.Submission;
 import com.dsaportal.service.SubmissionService;
@@ -133,6 +134,16 @@ public class SubmissionController {
     public ResponseEntity<SubmissionDto> updateSubmissionResult(@PathVariable Long id) {
         SubmissionDto submission = submissionService.updateSubmissionResult(id);
         return ResponseEntity.ok(submission);
+    }
+
+    @GetMapping("/next-problem")
+    public ResponseEntity<ProblemDto> getNextProblem(
+            @RequestParam Long userId,
+            @RequestParam Long currentProblemId,
+            @RequestParam(required = false) Double score) {
+        return submissionService.getNextProblemSuggestion(userId, currentProblemId, score)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/stats/user/{userId}")

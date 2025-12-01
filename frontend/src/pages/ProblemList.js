@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import ProblemCard from '../components/ProblemCard';
 
 function ProblemList() {
+  const { user, loading: authLoading } = useAuth();
   const [problems, setProblems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -14,22 +16,51 @@ function ProblemList() {
   });
 
   useEffect(() => {
-    fetchProblems();
-  }, [filters]);
+    // Wait for auth to finish loading before making API calls
+    if (!authLoading) {
+      // Only fetch if filters have actually changed (not on initial mount with empty filters)
+      if (filters.difficulty || filters.topic || filters.search || 
+          (!filters.difficulty && !filters.topic && !filters.search)) {
+        fetchProblems();
+      }
+    }
+  }, [filters, authLoading]);
 
   const fetchProblems = async () => {
     try {
       setLoading(true);
+      setError('');
       const params = new URLSearchParams();
       
       if (filters.difficulty) params.append('difficulty', filters.difficulty);
       if (filters.topic) params.append('topic', filters.topic);
       if (filters.search) params.append('search', filters.search);
 
+      // Problems endpoint is public, but we can still include token if available
+      console.log('[ProblemList] Fetching problems...');
       const response = await api.get(`/problems?${params.toString()}`);
+      console.log('[ProblemList] Success! Got', response.data.length, 'problems');
       setProblems(response.data);
     } catch (err) {
-      setError('Failed to load problems');
+      console.error('[ProblemList] Error details:', {
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data,
+        message: err.message,
+        url: err.config?.url
+      });
+      
+      // Don't redirect on 401/403 for problems endpoint (it's public)
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        console.warn('Unexpected auth error on public endpoint');
+        setError('Authentication error. Please log in again.');
+      } else if (err.response?.status >= 500) {
+        setError('Server error. Please try again later.');
+      } else if (!err.response) {
+        setError('Unable to connect to server. Please check your connection.');
+      } else {
+        setError('Failed to load problems. Please try again.');
+      }
       console.error('Problems error:', err);
     } finally {
       setLoading(false);
@@ -58,7 +89,8 @@ function ProblemList() {
     'STACK', 'QUEUE', 'LINKED_LIST', 'BINARY_TREE', 'HEAP'
   ];
 
-  if (loading) {
+  // Show loading while auth is initializing or data is loading
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>

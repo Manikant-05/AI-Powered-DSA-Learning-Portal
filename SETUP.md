@@ -325,7 +325,3 @@ If you encounter any issues:
 - [ ] AI recommendations working
 
 ---
-
-**Happy Coding! 🎉**
-
-If you have any questions or need help, don't hesitate to reach out!

@@ -1,18 +1,18 @@
 package com.dsaportal.service;
 
-import com.dsaportal.entity.Submission;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import com.dsaportal.entity.Submission;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class CodeAnalysisService {
@@ -53,7 +53,7 @@ public class CodeAnalysisService {
         prompt.append("Please analyze this code and provide:\n");
         prompt.append("1. Syntax correctness (true/false)\n");
         prompt.append("2. Efficiency score (0-100)\n");
-        prompt.append("3. Detailed feedback\n\n");
+        prompt.append("3. Detailed feedback with actionable suggestions and tips to improve\n\n");
         
         prompt.append("Respond in JSON format:\n");
         prompt.append("{\n");

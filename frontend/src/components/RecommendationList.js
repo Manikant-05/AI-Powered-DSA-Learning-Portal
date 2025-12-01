@@ -40,10 +40,13 @@ function RecommendationList({ recommendations, title = "AI Recommendations" }) {
       
       <div className="mt-6 text-center">
         <Link 
-          to="/problems" 
-          className="btn-secondary"
+          to="/problems"
+          className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200 shadow-md hover:shadow-lg"
         >
           View All Problems
+          <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
         </Link>
       </div>
     </div>

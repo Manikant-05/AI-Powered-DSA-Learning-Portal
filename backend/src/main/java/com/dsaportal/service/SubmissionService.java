@@ -1,5 +1,6 @@
 package com.dsaportal.service;
 
+import com.dsaportal.dto.ProblemDto;
 import com.dsaportal.dto.SubmissionDto;
 import com.dsaportal.entity.Problem;
 import com.dsaportal.entity.Submission;
@@ -31,6 +32,9 @@ public class SubmissionService {
     
     @Autowired
     private CodeAnalysisService codeAnalysisService;
+
+    @Autowired
+    private GeminiService geminiService;
     
     public List<SubmissionDto> getSubmissionsByUserId(Long userId) {
         return submissionRepository.findByUserIdOrderBySubmittedAtDesc(userId)
@@ -119,6 +123,14 @@ public class SubmissionService {
         }
         
         return new SubmissionDto(submission);
+    }
+
+    public Optional<ProblemDto> getNextProblemSuggestion(Long userId, Long currentProblemId, Double score) {
+        double normalizedScore = score != null ? score : 0.0;
+        return problemRepository.findById(currentProblemId)
+                .flatMap(problem -> geminiService
+                        .suggestNextProblem(userId, problem, normalizedScore)
+                        .map(ProblemDto::new));
     }
     
     public Long getTotalSubmissionsByUserId(Long userId) {

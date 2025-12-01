@@ -22,8 +22,14 @@ public class AuthController {
         try {
             AuthResponse response = authService.authenticateUser(loginRequest);
             return ResponseEntity.ok(response);
+        } catch (org.springframework.security.authentication.BadCredentialsException e) {
+            return ResponseEntity.status(401).body("Invalid username or password");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+            String errorMessage = e.getMessage();
+            if (errorMessage != null && errorMessage.contains("Bad credentials")) {
+                return ResponseEntity.status(401).body("Invalid username or password");
+            }
+            return ResponseEntity.badRequest().body("Error: " + errorMessage);
         }
     }
 

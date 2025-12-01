@@ -15,6 +15,7 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
     List<Problem> findByDifficulty(Difficulty difficulty);
     List<Problem> findByTopic(Topic topic);
     List<Problem> findByDifficultyAndTopic(Difficulty difficulty, Topic topic);
+    boolean existsByTitle(String title);
     
     @Query("SELECT p FROM Problem p WHERE " +
            "(:difficulty IS NULL OR p.difficulty = :difficulty) AND " +
