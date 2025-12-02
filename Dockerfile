@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y \
     postgresql-14 \
     postgresql-contrib-14 \
     curl \
+    dos2unix \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js and serve
@@ -46,7 +47,7 @@ COPY --from=frontend-builder /build/build /app/frontend
 COPY database/init.sql /app/init.sql
 COPY entrypoint.sh /app/entrypoint.sh
 
-RUN chmod +x /app/entrypoint.sh
+RUN dos2unix /app/entrypoint.sh && chmod +x /app/entrypoint.sh
 
 # Environment variables
 ENV SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/dsa_portal
