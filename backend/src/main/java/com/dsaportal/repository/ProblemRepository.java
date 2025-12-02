@@ -20,8 +20,8 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
     @Query("SELECT p FROM Problem p WHERE " +
            "(:difficulty IS NULL OR p.difficulty = :difficulty) AND " +
            "(:topic IS NULL OR p.topic = :topic) AND " +
-           "(:search IS NULL OR LOWER(p.title) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           "LOWER(p.description) LIKE LOWER(CONCAT('%', :search, '%')))")
+           "(:search IS NULL OR LOWER(p.title) LIKE :search OR " +
+           "LOWER(p.description) LIKE :search)")
     List<Problem> findByFilters(@Param("difficulty") Difficulty difficulty, 
                                @Param("topic") Topic topic, 
                                @Param("search") String search);
@@ -33,4 +33,6 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
     @Query("SELECT p FROM Problem p WHERE p.id NOT IN " +
            "(SELECT DISTINCT s.problem.id FROM Submission s WHERE s.user.id = :userId AND s.status = 'ACCEPTED')")
     List<Problem> findUnsolvedByUser(@Param("userId") Long userId);
+    
+    List<Problem> findTop3ByTopicAndDifficultyAndIdNot(Topic topic, Difficulty difficulty, Long id);
 }

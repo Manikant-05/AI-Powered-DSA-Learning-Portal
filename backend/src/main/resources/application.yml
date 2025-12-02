@@ -2,9 +2,9 @@ spring:
   application:
     name: ai-dsa-portal
   datasource:
-    url: jdbc:postgresql://localhost:5432/dsa_portal
-    username: postgres
-    password: Klu@0505
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/${POSTGRES_DB:dsa_portal}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:00000}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

@@ -38,7 +38,8 @@ public class ProblemService {
     }
     
     public List<ProblemDto> getProblemsByFilters(Problem.Difficulty difficulty, Problem.Topic topic, String search) {
-        return problemRepository.findByFilters(difficulty, topic, search)
+        String searchPattern = search != null ? "%" + search.toLowerCase() + "%" : null;
+        return problemRepository.findByFilters(difficulty, topic, searchPattern)
                 .stream()
                 .map(ProblemDto::new)
                 .collect(Collectors.toList());
@@ -91,5 +92,36 @@ public class ProblemService {
                 .stream()
                 .map(ProblemDto::new)
                 .collect(Collectors.toList());
+    }
+
+    public List<ProblemDto> getRecommendations(Long problemId) {
+        Problem current = problemRepository.findById(problemId)
+                .orElseThrow(() -> new RuntimeException("Problem not found"));
+        
+        // 1. Similar Practice (Same Topic, Same Difficulty)
+        List<Problem> recommendations = new java.util.ArrayList<>(problemRepository.findTop3ByTopicAndDifficultyAndIdNot(
+                current.getTopic(), current.getDifficulty(), problemId));
+        
+        // 2. Next Challenge (Same Topic, Higher Difficulty)
+        Problem.Difficulty nextDiff = getNextDifficulty(current.getDifficulty());
+        if (nextDiff != null) {
+            List<Problem> nextLevel = problemRepository.findTop3ByTopicAndDifficultyAndIdNot(
+                    current.getTopic(), nextDiff, problemId);
+            recommendations.addAll(nextLevel);
+        }
+        
+        // Limit to 4 recommendations total
+        return recommendations.stream()
+                .limit(4)
+                .map(ProblemDto::new)
+                .collect(Collectors.toList());
+    }
+
+    private Problem.Difficulty getNextDifficulty(Problem.Difficulty current) {
+        switch (current) {
+            case EASY: return Problem.Difficulty.MEDIUM;
+            case MEDIUM: return Problem.Difficulty.HARD;
+            default: return null;
+        }
     }
 }

@@ -37,34 +37,44 @@ function ProblemCard({ problem }) {
   };
 
   return (
-    <div className="card hover:shadow-lg transition-shadow duration-200">
+    <div className="card card-hover group h-full flex flex-col">
       <div className="flex justify-between items-start mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
+        <h3 className="text-lg font-bold text-slate-900 line-clamp-2 group-hover:text-primary-600 transition-colors">
           {problem.title}
         </h3>
-        <span className={`badge ${getDifficultyColor(problem.difficulty)} ml-2 flex-shrink-0`}>
+        <span className={`badge ${getDifficultyColor(problem.difficulty)} ml-3 flex-shrink-0`}>
           {problem.difficulty}
         </span>
       </div>
       
-      <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+      <p className="text-slate-600 text-sm mb-6 line-clamp-3 flex-grow">
         {problem.description}
       </p>
       
-      <div className="flex flex-wrap gap-2 mb-4">
-        <span className={`badge ${getTopicColor(problem.topic)}`}>
+      <div className="flex flex-wrap gap-2 mb-6">
+        <span className="badge badge-topic">
           {problem.topic.replace('_', ' ')}
         </span>
       </div>
       
-      <div className="flex justify-between items-center text-sm text-gray-500 mb-4">
-        <span>Time Limit: {problem.timeLimit}ms</span>
-        <span>Memory Limit: {problem.memoryLimit}MB</span>
+      <div className="flex justify-between items-center text-xs text-slate-500 mb-6 pt-4 border-t border-slate-100">
+        <div className="flex items-center">
+          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          {problem.timeLimit}ms
+        </div>
+        <div className="flex items-center">
+          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          {problem.memoryLimit}MB
+        </div>
       </div>
       
       <Link 
         to={`/problems/${problem.id}`}
-        className="btn-primary w-full text-center block"
+        className="btn-primary w-full text-center block shadow-lg shadow-primary-500/20 hover:shadow-primary-500/40"
       >
         Solve Problem
       </Link>
