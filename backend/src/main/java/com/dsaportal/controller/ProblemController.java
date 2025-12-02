@@ -98,4 +98,10 @@ public class ProblemController {
         List<ProblemDto> problems = problemService.getUnsolvedProblems(userId);
         return ResponseEntity.ok(problems);
     }
+
+    @GetMapping("/{id}/recommendations")
+    public ResponseEntity<List<ProblemDto>> getRecommendations(@PathVariable Long id) {
+        List<ProblemDto> recommendations = problemService.getRecommendations(id);
+        return ResponseEntity.ok(recommendations);
+    }
 }

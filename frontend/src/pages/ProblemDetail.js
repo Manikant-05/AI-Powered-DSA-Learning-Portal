@@ -19,6 +19,7 @@ function ProblemDetail() {
   const [nextProblemLoading, setNextProblemLoading] = useState(false);
   const [nextProblemError, setNextProblemError] = useState('');
   const [initialCodeLoaded, setInitialCodeLoaded] = useState(false);
+  const [recommendations, setRecommendations] = useState([]);
 
   const languages = [
     { value: 'python', label: 'Python' },
@@ -31,6 +32,10 @@ function ProblemDetail() {
 
 
   useEffect(() => {
+    // Reset state when problem ID changes
+    setSubmissionResult(null);
+    setRecommendations([]);
+    setNextProblemError('');
     fetchProblem();
   }, [id]);
 
@@ -126,6 +131,10 @@ function ProblemDetail() {
         efficiencyScore: response.data.efficiencyScore
       });
 
+      if (response.data.status === 'ACCEPTED') {
+        fetchRecommendations();
+      }
+
     } catch (err) {
       console.error('Submission error:', err);
       setSubmissionResult({
@@ -134,6 +143,15 @@ function ProblemDetail() {
       });
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const fetchRecommendations = async () => {
+    try {
+      const response = await api.get(`/problems/${id}/recommendations`);
+      setRecommendations(response.data);
+    } catch (err) {
+      console.error('Failed to fetch recommendations:', err);
     }
   };
 
@@ -404,18 +422,49 @@ function ProblemDetail() {
                   </div>
                 )}
                 {submissionResult.status === 'ACCEPTED' && (
-                  <div className="mt-4 space-y-2">
-                    {nextProblemError && (
-                      <div className="text-sm text-red-700 bg-red-100 rounded-md px-3 py-2">
-                        {nextProblemError}
+                  <div className="mt-6 pt-6 border-t border-slate-200">
+                    <h3 className="text-lg font-semibold text-slate-900 mb-4">Recommended Next Steps</h3>
+                    {recommendations.length > 0 ? (
+                      <div className="grid grid-cols-1 gap-4">
+                        {recommendations.map(rec => (
+                          <div 
+                            key={rec.id} 
+                            onClick={() => navigate(`/problems/${rec.id}`)}
+                            className="card hover:shadow-md transition-all cursor-pointer p-4 border border-slate-200 hover:border-primary-300 group"
+                          >
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <h4 className="font-medium text-slate-900 group-hover:text-primary-600 transition-colors">
+                                  {rec.title}
+                                </h4>
+                                <div className="flex items-center space-x-2 mt-1">
+                                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                                    rec.difficulty === 'EASY' ? 'bg-success-50 text-success-700' :
+                                    rec.difficulty === 'MEDIUM' ? 'bg-warning-50 text-warning-700' :
+                                    'bg-danger-50 text-danger-700'
+                                  }`}>
+                                    {rec.difficulty}
+                                  </span>
+                                  <span className="text-xs text-slate-500">
+                                    {rec.topic.replace('_', ' ')}
+                                  </span>
+                                </div>
+                              </div>
+                              <svg className="w-5 h-5 text-slate-400 group-hover:text-primary-500 transform group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                              </svg>
+                            </div>
+                          </div>
+                        ))}
                       </div>
+                    ) : (
+                      <p className="text-slate-500 text-sm">No specific recommendations available. Try exploring the problem list!</p>
                     )}
                     <button
-                      onClick={handleNextProblem}
-                      className="btn-secondary w-full md:w-auto"
-                      disabled={nextProblemLoading}
+                      onClick={() => navigate('/problems')}
+                      className="btn-secondary w-full mt-4"
                     >
-                      {nextProblemLoading ? 'Preparing next challenge...' : 'Next Recommended Problem'}
+                      Back to All Problems
                     </button>
                   </div>
                 )}

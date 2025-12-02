@@ -1,19 +1,21 @@
 services:
 
   backend:
-    build: ./backend
+    image: backend
+    # build: ./backend
     container_name: dsa_portal_backend
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/dsa_portal
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=Klu@0505
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://${DB_HOST:-host.docker.internal}:5432/${POSTGRES_DB:-dsa_portal}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER:-postgres}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-00000}
     networks:
       - dsa_network
 
   frontend:
-    build: ./frontend
+    image: frontend
+    # build: ./frontend
     container_name: dsa_portal_frontend
     ports:
       - "3000:3000"

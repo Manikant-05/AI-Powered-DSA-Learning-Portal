@@ -110,22 +110,27 @@ function ProblemList() {
 
       {/* Filters */}
       <div className="card">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="label">
               Search
             </label>
-            <input
-              type="text"
-              placeholder="Search problems..."
-              className="input"
-              value={filters.search}
-              onChange={(e) => handleFilterChange('search', e.target.value)}
-            />
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search problems..."
+                className="input pl-10"
+                value={filters.search}
+                onChange={(e) => handleFilterChange('search', e.target.value)}
+              />
+              <svg className="w-5 h-5 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="label">
               Difficulty
             </label>
             <select
@@ -141,7 +146,7 @@ function ProblemList() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="label">
               Topic
             </label>
             <select
@@ -171,21 +176,26 @@ function ProblemList() {
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
+        <div className="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded-lg flex items-center">
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
           {error}
         </div>
       )}
 
       {/* Problems Grid */}
       {problems.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="text-gray-400 mb-4">
-            <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <div className="text-center py-16 bg-white rounded-xl border border-slate-200 border-dashed">
+          <div className="text-slate-300 mb-4">
+            <svg className="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No problems found</h3>
-          <p className="text-gray-500">Try adjusting your filters or check back later for new problems.</p>
+          <h3 className="text-lg font-medium text-slate-900 mb-2">No problems found</h3>
+          <p className="text-slate-500 max-w-sm mx-auto">
+            We couldn't find any problems matching your filters. Try adjusting them or check back later.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
