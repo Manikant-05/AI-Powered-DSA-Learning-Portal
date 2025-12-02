@@ -74,52 +74,6 @@ ai-dsa-portal/
 ├── docker-compose.yml       # Docker orchestration
 ├── env.example             # Environment variables template
 └── README.md
-```
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Java 17 or higher
-- Node.js 18 or higher
-- Docker and Docker Compose
-- PostgreSQL (if running locally)
-
-### Option 1: Docker Compose (Recommended)
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd ai-dsa-portal
-   ```
-
-2. **Set up environment variables**
-   ```bash
-   cp env.example .env
-   # Edit .env with your API keys
-   ```
-
-3. **Start the application**
-   ```bash
-   docker-compose up -d
-   ```
-
-4. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8080/api
-   - Database: localhost:5432
-
-### Option 2: Local Development
-
-#### Backend Setup
-1. **Navigate to backend directory**
-   ```bash
-   cd backend
-   ```
-
-2. **Set up PostgreSQL database**
-   ```sql
-   CREATE DATABASE dsa_portal;
-   ```
 
 3. **Configure application.yml**
    ```yaml
@@ -224,6 +178,88 @@ JWT_EXPIRATION=86400000
 1. **Manage Problems** - Add, edit, or delete problems
 2. **Monitor Submissions** - View all user submissions
 3. **Analytics** - Track platform usage and performance
+
+## 🐳 Running with Docker (Unified Image)
+
+The entire application (Frontend + Backend + Database) now runs in a **single container**.
+
+1.  **Build the Image**:
+    ```bash
+    docker build -t dsa-portal-unified .
+    ```
+
+2.  **Run the Container** (Two Options):
+
+    ### Option A: With Data Persistence (Recommended)
+    This saves your database data even after container removal:
+    ```bash
+    docker run -d \
+      --name dsa-portal \
+      -p 3000:3000 \
+      -p 8080:8080 \
+      -v dsa-portal-data:/var/lib/postgresql/14/main \
+      dsa-portal-unified
+    ```
+
+    ### Option B: Without Persistence (Fresh Start)
+    ```bash
+    docker run -p 3000:3000 -p 8080:8080 dsa-portal-unified
+    ```
+
+3.  **Access the Application**:
+    -   Frontend: `http://localhost:3000`
+    -   Backend API: `http://localhost:8080`
+
+## 🔄 Managing Your Container
+
+```bash
+# Stop the container
+docker stop dsa-portal
+
+# Start it again (data is preserved if using volumes)
+docker start dsa-portal
+
+# View logs
+docker logs dsa-portal
+
+# Remove the container
+docker rm dsa-portal
+
+# Remove the container AND data volume
+docker rm dsa-portal
+docker volume rm dsa-portal-data
+```
+
+## 💻 Running Locally (Alternative)
+
+If you prefer running components separately without Docker:
+
+### 1. Database Setup
+-   Ensure PostgreSQL is running.
+-   Create a database named `dsa_portal`.
+-   Update `.env` with your database credentials.
+
+### 2. Backend Setup
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+### 3. Frontend Setup
+```bash
+cd frontend
+npm install
+npm start
+```
+
+## 🧪 Default Credentials
+
+-   **Admin User**: `admin` / `admin123`
+-   **Test User**: `testuser` / `password123`
+
+## 📝 License
+
+This project is licensed under the MIT License.
 
 ## 🔒 Security Features
 

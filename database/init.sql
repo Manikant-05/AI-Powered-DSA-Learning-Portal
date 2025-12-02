@@ -76,9 +76,11 @@ CREATE INDEX idx_submissions_status ON submissions(status);
 CREATE INDEX idx_submissions_submitted_at ON submissions(submitted_at);
 
 -- Insert sample data
+-- Password for 'admin' is 'admin123'
+-- Password for 'testuser' is 'password123'
 INSERT INTO users (username, email, password, role) VALUES 
-('admin', 'admin@dsaportal.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVEFDi', 'ADMIN'),
-('testuser', 'test@example.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVEFDi', 'USER');
+('admin', 'admin@dsaportal.com', '$2a$10$B3f2mfGBIHYWlnhyD08UNeeFP9MFLphAsLrM5IGybR1Ngod.88rNW', 'ADMIN'),
+('testuser', 'test@example.com', '$2a$10$cFNGWAd9bdC92rRzcDU2POMijvWecWpPXW1HY/vHEAlkLF/gx4bgG', 'USER');
 
 -- Insert sample problems
 INSERT INTO problems (title, description, difficulty, topic, input_format, output_format, constraints, time_limit, memory_limit) VALUES 
