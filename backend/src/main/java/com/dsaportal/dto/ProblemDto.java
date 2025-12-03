@@ -15,6 +15,7 @@ public class ProblemDto {
     private String inputFormat;
     private String outputFormat;
     private String constraints;
+    private String hint;
     private Integer timeLimit;
     private Integer memoryLimit;
     private LocalDateTime createdAt;
@@ -33,6 +34,7 @@ public class ProblemDto {
         this.inputFormat = problem.getInputFormat();
         this.outputFormat = problem.getOutputFormat();
         this.constraints = problem.getConstraints();
+        this.hint = problem.getHint();
         this.timeLimit = problem.getTimeLimit();
         this.memoryLimit = problem.getMemoryLimit();
         this.createdAt = problem.getCreatedAt();
@@ -108,6 +110,14 @@ public class ProblemDto {
 
     public void setConstraints(String constraints) {
         this.constraints = constraints;
+    }
+
+    public String getHint() {
+        return hint;
+    }
+
+    public void setHint(String hint) {
+        this.hint = hint;
     }
 
     public Integer getTimeLimit() {

@@ -29,6 +29,7 @@ CREATE TABLE problems (
     input_format TEXT,
     output_format TEXT,
     constraints TEXT,
+    hint TEXT,
     time_limit INTEGER DEFAULT 1000,
     memory_limit INTEGER DEFAULT 256,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

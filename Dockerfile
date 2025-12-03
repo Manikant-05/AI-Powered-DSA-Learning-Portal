@@ -45,6 +45,7 @@ WORKDIR /app
 COPY --from=backend-builder /build/target/*.jar /app/backend.jar
 COPY --from=frontend-builder /build/build /app/frontend
 COPY database/init.sql /app/init.sql
+COPY database/problems_data.sql /app/problems_data.sql
 COPY entrypoint.sh /app/entrypoint.sh
 
 RUN dos2unix /app/entrypoint.sh && chmod +x /app/entrypoint.sh

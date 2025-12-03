@@ -40,6 +40,9 @@ public class Problem {
     @Column(columnDefinition = "TEXT")
     private String constraints;
 
+    @Column(columnDefinition = "TEXT")
+    private String hint;
+
     @Column(name = "time_limit")
     private Integer timeLimit = 1000; // milliseconds
 
@@ -135,6 +138,14 @@ public class Problem {
 
     public void setConstraints(String constraints) {
         this.constraints = constraints;
+    }
+
+    public String getHint() {
+        return hint;
+    }
+
+    public void setHint(String hint) {
+        this.hint = hint;
     }
 
     public Integer getTimeLimit() {
