@@ -20,6 +20,7 @@ function ProblemDetail() {
   const [nextProblemError, setNextProblemError] = useState('');
   const [initialCodeLoaded, setInitialCodeLoaded] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
+  const [showHint, setShowHint] = useState(false);
 
   const languages = [
     { value: 'python', label: 'Python' },
@@ -36,6 +37,7 @@ function ProblemDetail() {
     setSubmissionResult(null);
     setRecommendations([]);
     setNextProblemError('');
+    setShowHint(false);
     fetchProblem();
   }, [id]);
 
@@ -299,6 +301,27 @@ function ProblemDetail() {
             <div className="prose max-w-none">
               <p className="text-gray-700 whitespace-pre-wrap">{problem.description}</p>
             </div>
+            
+            {problem.hint && (
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <button 
+                  onClick={() => setShowHint(!showHint)}
+                  className="flex items-center text-sm font-medium text-amber-600 hover:text-amber-700 transition-colors"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {showHint ? 'Hide Hint' : 'Show Hint'}
+                </button>
+                
+                {showHint && (
+                  <div className="mt-3 p-4 bg-amber-50 rounded-lg border border-amber-100 text-amber-900 text-sm animate-fadeIn">
+                    <div className="font-semibold mb-1">Hint:</div>
+                    {problem.hint}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {problem.inputFormat && (

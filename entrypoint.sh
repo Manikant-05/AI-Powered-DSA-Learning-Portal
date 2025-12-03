@@ -13,6 +13,7 @@ echo "[2/4] Initializing database..."
 su postgres -c "psql -lqt | cut -d \| -f 1 | grep -qw dsa_portal" || \
 su postgres -c "psql -c \"CREATE DATABASE dsa_portal;\""
 su postgres -c "psql -d dsa_portal -f /app/init.sql" 2>/dev/null || echo "Database already initialized"
+su postgres -c "psql -d dsa_portal -f /app/problems_data.sql" 2>/dev/null || echo "Problems data loaded"
 
 # Start Backend
 echo "[3/4] Starting Spring Boot Backend..."
