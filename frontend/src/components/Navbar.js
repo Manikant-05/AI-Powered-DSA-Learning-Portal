@@ -43,6 +43,14 @@ function Navbar() {
                 >
                   Profile
                 </Link>
+                {user.role === 'ADMIN' && (
+                  <Link 
+                    to="/admin" 
+                    className="text-slate-600 hover:text-primary-600 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+                  >
+                    Admin
+                  </Link>
+                )}
               </div>
             )}
           </div>

@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import ProblemList from './pages/ProblemList';
 import ProblemDetail from './pages/ProblemDetail';
 import Profile from './pages/Profile';
+import AdminDashboard from './pages/AdminDashboard';
 import './App.css';
 
 function ProtectedRoute({ children }) {
@@ -115,6 +116,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
               </ProtectedRoute>
             } 
           />
