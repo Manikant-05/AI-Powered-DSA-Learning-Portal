@@ -87,8 +87,12 @@ public class SubmissionService {
                 .orElseThrow(() -> new RuntimeException("Submission not found"));
         
         if (submission.getJudge0Token() != null) {
-            Submission.Status status = judge0Service.getSubmissionResultWithPolling(submission.getJudge0Token());
+            Judge0Service.Judge0Result result = judge0Service.getSubmissionResultWithPolling(submission.getJudge0Token());
+            Submission.Status status = result.getStatus();
             submission.setStatus(status);
+            submission.setErrorMessage(result.getErrorMessage());
+            submission.setTimeTaken(result.getTimeTaken());
+            submission.setMemoryUsed(result.getMemoryUsed());
             
             // Get code analysis from Gemini
             CodeAnalysisService.CodeAnalysisResult analysis = codeAnalysisService.analyzeCode(submission);
