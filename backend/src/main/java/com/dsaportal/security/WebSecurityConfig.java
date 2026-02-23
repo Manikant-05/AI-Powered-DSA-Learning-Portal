@@ -57,6 +57,7 @@ public class WebSecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth ->
                 auth.requestMatchers("/auth/**").permitAll()
+                    .requestMatchers("/health").permitAll()
                     .requestMatchers("/problems", "/problems/**").permitAll()
                     .requestMatchers(org.springframework.http.HttpMethod.GET, "/problems", "/problems/**").permitAll()
                     .requestMatchers("/h2-console/**").permitAll()

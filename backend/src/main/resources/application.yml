@@ -1,16 +1,25 @@
 spring:
+  main:
+    lazy-initialization: true
   application:
     name: ai-dsa-portal
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:5432/${POSTGRES_DB:dsa_portal}
-    username: ${POSTGRES_USER:postgres}
-    password: ${POSTGRES_PASSWORD:00000}
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 3
+      minimum-idle: 1
+      idle-timeout: 30000
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
+        temp.use_jdbc_metadata_defaults: false
+        transaction.jta.platform: org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform
         dialect: org.hibernate.dialect.PostgreSQLDialect
   h2:
     console:
@@ -22,7 +31,7 @@ spring:
       password: admin
 
 server:
-  port: 8080
+  port: ${PORT:8080}
   servlet:
     context-path: /api
 
